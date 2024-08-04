@@ -19,9 +19,20 @@ jobs:
       options: --privileged
 
     steps:
+    - name: Set TAG_NAME
+      run: | 
+        echo "TAG_NAME=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
     - name: Clone build scripts
       uses: actions/checkout@v4
 
-    - name: Build and upload stable .iso
+    - name: Build stable .iso
       run: |
         ./workflows.sh etc/terraform-stable-azure.conf "${{ secrets.key }}" "${{ secrets.secret }}" "${{ secrets.endpoint }}" "${{ secrets.bucket }}"
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifacts
+        path: |
+         ./builds/amd64/*.iso
